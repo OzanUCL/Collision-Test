@@ -215,24 +215,24 @@ int main (int argc, char *argv[])
 
   //Separate sinks with ports 9 and 1o
 //  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 9));
-  PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 9));
+  PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 9));//any IP in the sink defined in wifiApNode
   ApplicationContainer apSink1;
-  apSink1 = sinkHelper.Install(wifiApNode);
+  apSink1 = sinkHelper.Install(wifiApNode.Get(0));//Specify the Ap that is receiving all data
 
 //  PacketSinkHelper sinkHelper2 ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 10));
   PacketSinkHelper sinkHelper2 ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 10));
   ApplicationContainer apSink2;
-  apSink2 = sinkHelper2.Install(wifiApNode);
+  apSink2 = sinkHelper2.Install(wifiApNode.Get(1));
 
-//  OnOffHelper OnOff = OnOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (StaInterface.GetAddress (0), 9));
-  OnOffHelper OnOff = OnOffHelper ("ns3::TcpSocketFactory", InetSocketAddress (StaInterface.GetAddress (0), 9));
+//  OnOffHelper OnOff = OnOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (ApInterface.GetAddress (0), 9));
+  OnOffHelper OnOff = OnOffHelper ("ns3::TcpSocketFactory", InetSocketAddress (ApInterface.GetAddress (0), 9));
 //  OnOff.SetAttribute ("OnTime", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1]"));
 //  OnOff.SetAttribute ("OffTime", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1]"));
   OnOff.SetAttribute ("PacketSize", UintegerValue (payloadSize));
   OnOff.SetAttribute ("DataRate", StringValue ("7Mbps"));
 
-//  OnOffHelper OnOff2 = OnOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (StaInterface.GetAddress (1), 10));
-  OnOffHelper OnOff2 = OnOffHelper ("ns3::TcpSocketFactory", InetSocketAddress (StaInterface.GetAddress (1), 10));
+//  OnOffHelper OnOff2 = OnOffHelper ("ns3::UdpSocketFactory", InetSocketAddress (ApInterface.GetAddress (1), 10));
+  OnOffHelper OnOff2 = OnOffHelper ("ns3::TcpSocketFactory", InetSocketAddress (ApInterface.GetAddress (1), 10)); // Transmitting to this AP2
 //  OnOff2.SetAttribute ("OnTime", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1]"));
 //  OnOff2.SetAttribute ("OffTime", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1]"));
   OnOff2.SetAttribute ("PacketSize", UintegerValue (payloadSize));
@@ -241,10 +241,10 @@ int main (int argc, char *argv[])
   //each sta sends separately to one of the sinks on ports 9 and 10
   ApplicationContainer senderAppSta1;
 
-  senderAppSta1 = OnOff.Install(wifiApNode.Get(0));
+  senderAppSta1 = OnOff.Install(wifiStaNodes.Get(0));// Who is sending the data (Here is the Station 1)
   //OnOff.SetAttribute ("Remote", AddressValue(InetSocketAddress (ApInterface.GetAddress (0), 10)));
   ApplicationContainer senderAppSta2;
-  senderAppSta2 = OnOff2.Install(wifiApNode.Get(1));
+  senderAppSta2 = OnOff2.Install(wifiStaNodes.Get(1));
 
   phy.EnablePcap ("SimpleHtHiddenStations_Ap", apDevice.Get (0));
   phy.EnablePcap ("SimpleHtHiddenStations_Ap2", apDevice.Get (1));
